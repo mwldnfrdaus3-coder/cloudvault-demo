@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>CloudVault (Demo)</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+
+        h2 {
+            margin-top: 40px;
+        }
+
+        input[type="file"],
+        input[type="text"],
+        textarea {
+            display: block;
+            margin-top: 10px;
+            margin-bottom: 10px;
+            width: 100%;
+            max-width: 600px;
+        }
+
+        button,
+        input[type="submit"] {
+            margin-top: 10px;
+            padding: 5px 10px;
+            font-size: 14px;
+        }
+
+        .file-list {
+            margin-top: 20px;
+        }
+
+        .file-item {
+            margin: 5px 0;
+        }
+
+        .file-item a {
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>CloudVault (Demo)</h2>
+    <input type="file" id="fileUpload">
+    <button onclick="uploadFile()">Upload File</button>
+
+    <hr>
+
+    <h2>Simpan Catatan Teks</h2>
+    <input type="text" id="textFileName" placeholder="Nama file (contoh: catatan)">
+    <textarea id="textContent" rows="6" placeholder="Tulis isi teks di sini..."></textarea>
+    <button onclick="saveText()">Simpan Teks</button>
+
+    <hr>
+
+    <button onclick="listFiles()">List files</button>
+    <ul id="fileList" class="file-list"></ul>
+
+    <script>
+        const fileStorage = [];
+
+        function uploadFile() {
+            const fileInput = document.getElementById("fileUpload");
+            const file = fileInput.files[0];
+            if (file) {
+                fileStorage.push({
+                    name: file.name,
+                    size: (file.size / 1024).toFixed(0) + " KB"
+                });
+                alert("File '" + file.name + "' berhasil diupload!");
+                fileInput.value = "";
+            } else {
+                alert("Pilih file terlebih dahulu.");
+            }
+        }
+
+        function saveText() {
+            const fileName = document.getElementById("textFileName").value;
+            const content = document.getElementById("textContent").value;
+            if (fileName.trim() === "") {
+                alert("Nama file tidak boleh kosong!");
+                return;
+            }
+
+            fileStorage.push({
+                name: fileName + ".txt",
+                size: (new Blob([content]).size / 1024).toFixed(0) + " KB"
+            });
+
+            alert("Catatan '" + fileName + ".txt' berhasil disimpan.");
+            document.getElementById("textFileName").value = "";
+            document.getElementById("textContent").value = "";
+        }
+
+        function listFiles() {
+            const list = document.getElementById("fileList");
+            list.innerHTML = "";
+
+            fileStorage.forEach((file, index) => {
+                const li = document.createElement("li");
+                li.classList.add("file-item");
+
+                const link = document.createElement("a");
+                link.href = "#";
+                link.textContent = file.name + " (" + file.size + ")";
+                li.appendChild(link);
+
+                const delBtn = document.createElement("button");
+                delBtn.textContent = "Delete";
+                delBtn.style.marginLeft = "10px";
+                delBtn.onclick = () => {
+                    fileStorage.splice(index, 1);
+                    listFiles();
+                };
+
+                li.appendChild(delBtn);
+                list.appendChild(li);
+            });
+        }
+    </script>
+
+</body>
+</html>
